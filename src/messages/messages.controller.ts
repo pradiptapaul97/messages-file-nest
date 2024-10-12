@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, NotFoundException } from '@nestjs/common';
 import { createMessageDto } from "./dtos/create-message.dto";
 import { MessagesService } from "./messages.service";
 
@@ -19,10 +19,17 @@ export class MessagesController {
     }
 
     @Get("/:id")
-    getMessage(@Param("id") id : string)
+    async getMessage(@Param("id") id : string)
     {
         console.log(id);
-        return this.messagesService.findOne(id);
+        const message = await this.messagesService.findOne(id);
+
+        if(!message)
+        {
+            throw new NotFoundException("Message not found")
+        }
+
+        return message;
     }
 
     @Post()
